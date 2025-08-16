@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestion Matériel IT - Historique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/historique.css" />
+    <!-- jsPDF + AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- html2canvas pour screenshot modal -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f5064d23-f6fa-49e9-9428-c7d99f6f16a5.png"
+                    alt="Logo gestion matériel IT">
+                Gestion Matériel IT
+            </h1>
+            <p>Système de suivi des attributions et restitutions</p>
+        </header>
+
+        <div class="main-card">
+            <!-- Navigation -->
+            <div class="nav-tabs">
+                <a href="index.html" class="tab-button">
+                    <i class="fas fa-laptop"></i>Attribution
+                </a>
+                <a href="restitution.html" class="tab-button">
+                    <i class="fas fa-undo"></i>Restitution
+                </a>
+                <a href="historique.html" class="tab-button active">
+                    <i class="fas fa-history"></i>Historique
+                </a>
+            </div>
+
+            <!-- Contenu historique -->
+            <div class="tab-content active">
+                <h2 class="section-title">HISTORIQUE DES MATERIELS</h2>
+
+                <!-- Filtres -->
+                <div class="filters-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-filter"></i>Filtres de recherche
+                    </h3>
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label for="employe-input" class="filter-label">Nom de l'employé</label>
+                            <input type="text" id="employe-input" class="filter-input" oninput="filterHistorique()"
+                                placeholder="Tapez le nom de l'employé...">
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="service-input" class="filter-label">Service</label>
+                            <select id="service-input" class="filter-select" onchange="filterHistorique()">
+                                <option value="">Tous les services</option>
+                                <option value="Direction générale">Direction générale</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Contrôle de gestion">Contrôle de gestion</option>
+                                <option value="Finance et comptabilité">Finance et comptabilité</option>
+                                <option value="Performance">Performance</option>
+                                <option value="Supply chain">Supply chain</option>
+                                <option value="QHSE">QHSE</option>
+                                <option value="Technique">Technique</option>
+                                <option value="Planification">Planification</option>
+                                <option value="Informatique">Informatique</option>
+                                <option value="Recouvrement">Recouvrement</option>
+                                <option value="Commercial">Commercial</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="type-materiel" class="filter-label">Type de matériel</label>
+                            <input type="text" id="type-materiel" class="filter-input" oninput="filterHistorique()"
+                                placeholder="Ex: Ordinateur, Imprimante...">
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="serie-input" class="filter-label">Numéro de série</label>
+                            <input type="text" id="serie-input" class="filter-input" oninput="filterHistorique()"
+                                placeholder="Tapez le numéro de série...">
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="filter-label">Période</label>
+                            <div class="date-range">
+                                <div class="filter-group">
+                                    <input type="date" id="date-debut" class="filter-input" onchange="filterHistorique()" placeholder="Date début">
+                                </div>
+                                <div class="filter-group">
+                                    <input type="date" id="date-fin" class="filter-input" onchange="filterHistorique()" placeholder="Date fin">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tableau historique -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Type d'Opération</th>
+                                <th>Nom Employé</th>
+                                <th>Service</th>
+                                <th>Matériel (Type - Modèle)</th>
+                                <th>N° Série</th>
+                                <th>Date Opération</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historique-body">
+                            <!-- Les données JS iront ici -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Bouton export -->
+                <div class="button-group">
+                    <button id="export-historique-btn" class="export-button">
+                        <i class="fas fa-file-pdf"></i>Exporter l'historique en PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour les détails -->
+    <div id="details-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Détails de l'opération</h3>
+                <button id="close-modal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-content">
+                    <!-- Contenu dynamique -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="export-details-pdf" class="export-button">
+                    <i class="fas fa-file-pdf"></i>Exporter les détails en PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tableau global filtré, accessible aux fonctions
+        let filteredHistoriqueData = [];
+
+        // Fonction pour filtrer et afficher les données
+        async function filterHistorique() {
+            const employeInput = document.getElementById('employe-input').value;
+            const serviceSelect = document.getElementById('service-input').value;
+            const typeMateriel = document.getElementById('type-materiel').value;
+            const serieInput = document.getElementById('serie-input').value;
+            const dateDebut = document.getElementById('date-debut').value;
+            const dateFin = document.getElementById('date-fin').value;
+
+            // Construire les paramètres de requête
+            const params = new URLSearchParams();
+            if (employeInput) params.append('employe', employeInput);
+            if (serviceSelect) params.append('service', serviceSelect);
+            if (typeMateriel) params.append('type_materiel', typeMateriel);
+            if (serieInput) params.append('serie', serieInput);
+            if (dateDebut) params.append('date_debut', dateDebut);
+            if (dateFin) params.append('date_fin', dateFin);
+
+            try {
+                const response = await fetch(`/api/historique?${params.toString()}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    filteredHistoriqueData = result.data;
+                    displayHistorique(filteredHistoriqueData);
+                } else {
+                    console.error('Erreur lors de la récupération de l\'historique:', result.error);
+                    displayHistorique([]);
+                }
+            } catch (error) {
+                console.error('Erreur lors de la requête:', error);
+                displayHistorique([]);
+            }
+        }
+
+        // Affiche les données dans le tableau
+        function displayHistorique(data) {
+            const tbody = document.getElementById('historique-body');
+            tbody.innerHTML = "";
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>Aucune donnée trouvée</h3>
+                            <p>Aucune opération ne correspond aux critères de recherche</p>
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            data.forEach((op, index) => {
+                const materielDisplay = `${op.type_materiel || '-'} - ${op.modele || '-'}`;
+                const serieDisplay = op.numero_serie || '-';
+                const badgeClass = op.type_operation === 'attribution' ? 'badge-attribution' : 'badge-restitution';
+                const typeDisplay = op.type_operation === 'attribution' ? 'Attribution' : 'Restitution';
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>
+                        <span class="badge ${badgeClass}">${typeDisplay}</span>
+                    </td>
+                    <td>${op.employe_nom || "-"}</td>
+                    <td>${op.service_nom || "-"}</td>
+                    <td>${materielDisplay}</td>
+                    <td>${serieDisplay}</td>
+                    <td>${op.date_operation || "-"}</td>
+                    <td>
+                        <button class="action-button" onclick="showDetails(${op.id})">
+                            <i class="fas fa-eye"></i> Détails
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Affiche la modale détails
+        async function showDetails(operationId) {
+            try {
+                const response = await fetch(`/api/operation/${operationId}`);
+                const result = await response.json();
+
+                if (!result.success) {
+                    alert('Erreur lors de la récupération des détails: ' + result.error);
+                    return;
+                }
+
+                const operation = result.data.operation;
+                const signatures = result.data.signatures;
+                const modalContent = document.getElementById('modal-content');
+                const modalTitle = document.getElementById('modal-title');
+                const detailsModal = document.getElementById('details-modal');
+
+                const typeDisplay = operation.type_operation === 'attribution' ? 'Attribution' : 'Restitution';
+                modalTitle.textContent = `Détails de l'opération : ${typeDisplay}`;
+
+                let contentHtml = `
+                    <h2 class="section-title">${operation.type_operation === "attribution" ? "Formulaire d'attribution" : "Formulaire de restitution"}</h2>
+                    <table class="details-table">
+                        <tbody>
+                            <tr><th>Type d'opération</th><td>${typeDisplay}</td></tr>
+                            <tr><th>Nom de l'employé</th><td>${operation.employe_nom || '-'}</td></tr>
+                            <tr><th>Service</th><td>${operation.service_nom || '-'}</td></tr>
+                            <tr><th>Date de l'opération</th><td>${operation.date_operation || '-'}</td></tr>
+                            <tr><th>Type matériel</th><td>${operation.type_materiel || '-'}</td></tr>
+                            <tr><th>Modèle</th><td>${operation.modele || '-'}</td></tr>
+                            <tr><th>N° Série</th><td>${operation.numero_serie || '-'}</td></tr>
+                `;
+
+                if (operation.type_operation === "attribution") {
+                    contentHtml += `
+                        <tr><th>Date Remise</th><td>${operation.date_remise || '-'}</td></tr>
+                    `;
+                } else {
+                    contentHtml += `
+                        <tr><th>Date Restitution</th><td>${operation.date_restitution || '-'}</td></tr>
+                    `;
+                }
+
+                contentHtml += `</tbody></table>`;
+
+                // Tableau signatures
+                contentHtml += `
+                    <h3 class="form-section-title">
+                        <i class="fas fa-signature"></i>Signatures
+                    </h3>
+                    <table class="details-table">
+                        <thead>
+                            <tr>
+                                <th>Rôle</th>
+                                <th>Nom</th>
+                                <th>Fonction</th>
+                                <th>Date</th>
+                                <th>Signature</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                // Organiser les signatures par type
+                const signaturesByType = {};
+                signatures.forEach(sig => {
+                    signaturesByType[sig.type_signature] = sig;
+                });
+
+                const signatureTypes = [
+                    { key: 'redaction', label: 'Rédaction' },
+                    { key: 'validation', label: 'Validation' },
+                    { key: 'destinataire', label: 'Destinataire' }
+                ];
+
+                signatureTypes.forEach(sigType => {
+                    const sig = signaturesByType[sigType.key];
+                    contentHtml += `
+                        <tr>
+                            <td>${sigType.label}</td>
+                            <td>${sig ? sig.nom : '-'}</td>
+                            <td>${sig ? sig.fonction : '-'}</td>
+                            <td>${sig ? sig.date_signature : '-'}</td>
+                            <td>${sig && sig.fichier_signature ? `<img src="${sig.fichier_signature}" class="signature-image">` : '-'}</td>
+                        </tr>
+                    `;
+                });
+
+                contentHtml += `
+                        </tbody>
+                    </table>
+                `;
+
+                modalContent.innerHTML = contentHtml;
+                detailsModal.classList.add('show');
+
+            } catch (error) {
+                console.error('Erreur lors de la récupération des détails:', error);
+                alert('Erreur lors de la récupération des détails');
+            }
+        }
+
+        // Fermeture modale
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('details-modal').classList.remove('show');
+        });
+
+        // Fermeture modale en cliquant sur l'overlay
+        document.getElementById('details-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'details-modal') {
+                e.target.classList.remove('show');
+            }
+        });
+
+        // Export PDF historique complet (toute la page)
+        async function exportHistoriqueToPdf() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            try {
+                // Masquer les éléments non nécessaires pour la capture
+                const exportBtn = document.getElementById('export-historique-btn');
+                const originalDisplay = exportBtn.style.display;
+                exportBtn.style.display = 'none';
+
+                // Attendre un peu pour que le changement soit pris en compte
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                // Capturer toute la page
+                const canvas = await html2canvas(document.body, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    scrollY: 0,
+                    scrollX: 0,
+                    windowWidth: document.documentElement.scrollWidth,
+                    windowHeight: document.documentElement.scrollHeight
+                });
+
+                // Restaurer l'affichage du bouton
+                exportBtn.style.display = originalDisplay;
+
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+
+                let position = 0;
+
+                // Ajouter la première page
+                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                // Ajouter des pages supplémentaires si nécessaire
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    doc.addPage();
+                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                doc.save("historique_materiel_complet.pdf");
+
+            } catch (error) {
+                console.error('Erreur lors de l\'export PDF:', error);
+                alert('Erreur lors de l\'export PDF. Veuillez réessayer.');
+                
+                // Restaurer l'affichage du bouton en cas d'erreur
+                const exportBtn = document.getElementById('export-historique-btn');
+                exportBtn.style.display = '';
+            }
+        }
+
+        document.getElementById('export-historique-btn').addEventListener('click', exportHistoriqueToPdf);
+
+        // Export PDF détails modal (capture d'écran du contenu modal)
+        document.getElementById('export-details-pdf').addEventListener('click', async () => {
+            const modal = document.getElementById('details-modal');
+            const modalBox = modal.querySelector('.modal-content');
+            const exportButton = document.getElementById('export-details-pdf');
+
+            try {
+                // Masquer le bouton avant capture
+                exportButton.style.display = 'none';
+
+                // Petite attente pour que la disparition du bouton soit prise en compte
+                await new Promise(r => setTimeout(r, 100));
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                const canvas = await html2canvas(modalBox, { 
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true
+                });
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+
+                let position = 0;
+
+                // Ajouter la première page
+                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                // Ajouter des pages supplémentaires si nécessaire
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    doc.addPage();
+                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                doc.save("details_operation.pdf");
+
+            } catch (error) {
+                console.error('Erreur lors de l\'export PDF des détails:', error);
+                alert('Erreur lors de l\'export PDF. Veuillez réessayer.');
+            } finally {
+                // Remontrer le bouton
+                exportButton.style.display = '';
+            }
+        });
+
+        // Initialisation au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            filterHistorique();
+
+            // Rafraichir si localStorage change (multi onglets)
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'historiqueOperations') {
+                    filterHistorique();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestion Matériel IT - Restitution</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/restitution.css" />
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f5064d23-f6fa-49e9-9428-c7d99f6f16a5.png" alt="Logo gestion matériel IT">
+                Gestion Matériel IT
+            </h1>
+            <p>Système de suivi des attributions et restitutions</p>
+        </header>
+
+        <div class="main-card">
+            <!-- Navigation -->
+            <div class="nav-tabs">
+                <a href="index.html" class="tab-button">
+                    <i class="fas fa-laptop"></i>Attribution
+                </a>
+                <a href="restitution.html" class="tab-button active">
+                    <i class="fas fa-undo"></i>Restitution
+                </a>
+                <a href="historique.html" class="tab-button">
+                    <i class="fas fa-history"></i>Historique
+                </a>
+            </div>
+
+            <!-- Formulaire de restitution -->
+            <div class="tab-content active">
+                <h2 class="section-title">FORMULAIRE DE RESTITUTION</h2>
+                
+                <form id="form-restitution" enctype="multipart/form-data">
+                    <div class="form-container">
+                        <!-- Informations employé -->
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-user"></i>Informations de l'employé
+                            </h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="attribution-nom" class="form-label">Nom de l'employé</label>
+                                    <input type="text" id="attribution-nom" name="nom" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="attribution-service" class="form-label">Sélectionner le service</label>
+                                    <select id="attribution-service" name="service" class="form-select" required>
+                                        <option value="">Choisir un service...</option>
+                                        <option value="Direction générale">Direction générale</option>
+                                        <option value="Maintenance">Maintenance</option>
+                                        <option value="Contrôle de gestion">Contrôle de gestion</option>
+                                        <option value="Finance et comptabilité">Finance et comptabilité</option>
+                                        <option value="Performance">Performance</option>
+                                        <option value="Supply chain">Supply chain</option>
+                                        <option value="QHSE">QHSE</option>
+                                        <option value="Technique">Technique</option>
+                                        <option value="Planification">Planification</option>
+                                        <option value="Informatique">Informatique</option>
+                                        <option value="Recouvrement">Recouvrement</option>
+                                        <option value="Commercial">Commercial</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informations matériel -->
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-laptop"></i>Matériel à restituer
+                            </h3>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Modèle</th>
+                                            <th>N° Série</th>
+                                            <th>Date Restitution</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <select id="restitution-type" name="type" class="form-select" required>
+                                                    <option value="">Sélectionner...</option>
+                                                    <option value="ordinateur_portable">Ordinateur portable</option>
+                                                    <option value="ordinateur_bureau">Ordinateur de bureau</option>
+                                                    <option value="ecran">Écran</option>
+                                                    <option value="telephone">Téléphone</option>
+                                                    <option value="tablette">Tablette</option>
+                                                    <option value="accessoires">Accessoires</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" id="restitution-modele" name="modele" class="form-input" required>
+                                            </td>
+                                            <td>
+                                                <input type="text" id="restitution-serie" name="serie" class="form-input" required>
+                                            </td>
+                                            <td>
+                                                <input type="date" id="restitution-date" name="dateRestitution" class="form-input" required>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="fas fa-signature"></i>Signatures et validation
+                            </h3>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Rédacteur</th>
+                                            <th>Validation</th>
+                                            <th>Destinataire</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="redacteur_nom" placeholder="Nom" class="form-input" required>
+                                                <input type="text" name="redacteur_fonction" placeholder="Fonction" class="form-input" required>
+                                                <input type="date" name="redacteur_date" class="form-input" required>
+                                                <div class="file-upload">
+                                                    <input type="file" name="redacteur_signature" accept="image/*" required>
+                                                    <label class="file-upload-label">
+                                                        <i class="fas fa-upload"></i> Signature rédacteur
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" name="validateur_nom" placeholder="Nom" class="form-input" required>
+                                                <input type="text" name="validateur_fonction" placeholder="Fonction" class="form-input" required>
+                                                <input type="date" name="validateur_date" class="form-input" required>
+                                                <div class="file-upload">
+                                                    <input type="file" name="validation_signature" accept="image/*" required>
+                                                    <label class="file-upload-label">
+                                                        <i class="fas fa-upload"></i> Signature validation
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" name="destinataire_nom" placeholder="Nom" class="form-input" required>
+                                                <input type="text" name="destinataire_fonction" placeholder="Fonction" class="form-input" required>
+                                                <input type="date" name="destinataire_date" class="form-input" required>
+                                                <div class="file-upload">
+                                                    <input type="file" name="destinataire_signature" accept="image/*" required>
+                                                    <label class="file-upload-label">
+                                                        <i class="fas fa-upload"></i> Signature destinataire
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="button-group">
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-times"></i>Annuler
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-undo"></i>Soumettre la restitution
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fonction utilitaire pour convertir un fichier en Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Gestion des uploads de fichiers
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                const label = this.nextElementSibling;
+                if (this.files.length > 0) {
+                    label.innerHTML = `<i class="fas fa-check"></i> ${this.files[0].name}`;
+                    label.style.background = 'var(--restitution-accent)';
+                    label.style.color = 'var(--white)';
+                } else {
+                    label.innerHTML = '<i class="fas fa-upload"></i> Choisir un fichier';
+                    label.style.background = '';
+                    label.style.color = '';
+                }
+            });
+        });
+
+        // Fonction pour convertir un fichier en base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Gestion du formulaire de restitution
+        document.getElementById('form-restitution').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // État de chargement
+            submitBtn.classList.add('loading');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enregistrement...';
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData(this);
+                
+                // Récupérer les données du tableau
+                const tableRows = document.querySelectorAll('table.data-table tbody tr');
+                const materiels = [];
+                
+                tableRows.forEach(row => {
+                    const type = row.querySelector('select[name="type"]')?.value;
+                    const modele = row.querySelector('input[name="modele"]')?.value;
+                    const serie = row.querySelector('input[name="serie"]')?.value;
+                    const dateRestitution = row.querySelector('input[name="dateRestitution"]')?.value;
+                    
+                    if (type && modele && serie) {
+                        materiels.push({
+                            type: type,
+                            modele: modele,
+                            serie: serie,
+                            dateRestitution: dateRestitution
+                        });
+                    }
+                });
+
+                // Récupérer les signatures
+                const signatureRedacteur = document.querySelector('input[name="redacteur_signature"]').files[0];
+                const signatureValidation = document.querySelector('input[name="validation_signature"]').files[0];
+                const signatureDestinataire = document.querySelector('input[name="destinataire_signature"]').files[0];
+
+                // Vérifier que toutes les signatures sont présentes
+                if (!signatureRedacteur || !signatureValidation || !signatureDestinataire) {
+                    alert('Veuillez télécharger toutes les signatures requises.');
+                    return;
+                }
+
+                // Convertir les signatures en base64
+                const signatureRedacteurBase64 = await fileToBase64(signatureRedacteur);
+                const signatureValidationBase64 = await fileToBase64(signatureValidation);
+                const signatureDestinataireBase64 = await fileToBase64(signatureDestinataire);
+
+                // Préparer les données pour l'envoi
+                const data = {
+                    nom: formData.get('nom'),
+                    service: formData.get('service'),
+                    materiels: materiels,
+                    redaction: {
+                        nom: formData.get('redacteur_nom'),
+                        fonction: formData.get('redacteur_fonction'),
+                        date: formData.get('redacteur_date')
+                    },
+                    validation: {
+                        nom: formData.get('validateur_nom'),
+                        fonction: formData.get('validateur_fonction'),
+                        date: formData.get('validateur_date')
+                    },
+                    destinataire: {
+                        nom: formData.get('destinataire_nom'),
+                        fonction: formData.get('destinataire_fonction'),
+                        date: formData.get('destinataire_date')
+                    },
+                    signatures: {
+                        redaction: signatureRedacteurBase64,
+                        validation: signatureValidationBase64,
+                        destinataire: signatureDestinataireBase64
+                    }
+                };
+
+                // Envoyer les données au backend
+                const response = await fetch('/api/restitution', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Afficher un message de succès
+                    alert('Restitution enregistrée avec succès ! Redirection vers l\'historique...');
+                    
+                    // Rediriger vers l'historique après un court délai
+                    setTimeout(() => {
+                        window.location.href = '/historique';
+                    }, 1500);
+                } else {
+                    alert('Erreur lors de l\'enregistrement: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de l\'enregistrement. Veuillez réessayer.');
+            } finally {
+                // Restaurer l'état du bouton
+                submitBtn.classList.remove('loading');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
