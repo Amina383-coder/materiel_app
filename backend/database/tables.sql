@@ -1,10 +1,3 @@
--- Création de la base de données
-CREATE DATABASE IF NOT EXISTS materiel_it_db
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-
-USE materiel_it_db;
-
 -- Table des services
 CREATE TABLE IF NOT EXISTS services (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -48,19 +41,30 @@ CREATE TABLE IF NOT EXISTS materiels (
     FOREIGN KEY (type_id) REFERENCES types_materiel(id) ON DELETE RESTRICT
 );
 
--- Table des opérations (attributions et restitutions)
+-- Table des opérations unifiée (attributions, restitutions et incidents)
 CREATE TABLE IF NOT EXISTS operations (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    type_operation ENUM('attribution', 'restitution') NOT NULL,
-    employe_id INT NOT NULL,
-    materiel_id INT NOT NULL,
+    numero_fiche VARCHAR(50),
+    type_operation ENUM('attribution', 'restitution', 'incident') NOT NULL,
+    employe_id INT,
+    materiel_id INT,
     date_operation DATE NOT NULL,
     date_remise DATE,
     date_restitution DATE,
     motif TEXT,
+    -- Champs spécifiques aux incidents
+    declarant_nom VARCHAR(150),
+    telephone VARCHAR(50),
+    email VARCHAR(150),
+    poste VARCHAR(150),
+    numero_serie_actif VARCHAR(150),
+    actifs_json LONGTEXT,
+    natures_json LONGTEXT,
+    autres_infos TEXT,
+    signature_png LONGTEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (employe_id) REFERENCES employes(id) ON DELETE RESTRICT,
-    FOREIGN KEY (materiel_id) REFERENCES materiels(id) ON DELETE RESTRICT
+    FOREIGN KEY (employe_id) REFERENCES employes(id) ON DELETE SET NULL,
+    FOREIGN KEY (materiel_id) REFERENCES materiels(id) ON DELETE SET NULL
 );
 
 -- Table des signatures

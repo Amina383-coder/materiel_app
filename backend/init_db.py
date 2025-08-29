@@ -30,9 +30,9 @@ def create_database():
             # Utiliser la base de données
             cursor.execute(f"USE {Config.DB_NAME}")
             
-            # Lire et exécuter le script SQL
+            # Lire et exécuter le script SQL pour les tables
             print("Création des tables...")
-            with open('database/schema.sql', 'r', encoding='utf-8') as file:
+            with open('database/tables.sql', 'r', encoding='utf-8') as file:
                 sql_commands = file.read()
                 
             # Diviser les commandes SQL

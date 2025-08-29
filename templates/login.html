@@ -1,5 +1,103 @@
-<form method="post" action="/login">
-  <input type="text" name="username" placeholder="Nom d'utilisateur">
-  <input type="password" name="password" placeholder="Mot de passe">
-  <button type="submit">Se connecter</button>
-</form>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Connexion - Gestion Matériel IT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}" />
+    <style>
+        :root {
+            --brand: #0ea5e9;
+            --brand-dark: #0284c7;
+            --bg-start: #f0f9ff;
+            --bg-end: #e0f2fe;
+        }
+        body {
+            min-height: 100vh; margin: 0; display: grid; place-items: center; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        }
+        .shell { width: 100%; max-width: 960px; display: grid; grid-template-columns: 1.1fr 0.9fr; background: #fff; border-radius: 18px; box-shadow: 0 25px 60px rgba(2,132,199,.25); overflow: hidden; border: 1px solid #e5e7eb; }
+        .brand {
+            background: radial-gradient(1200px 400px at -10% -10%, #7dd3fc 0%, transparent 60%), linear-gradient(160deg, var(--brand) 0%, var(--brand-dark) 100%);
+            color: #fff; padding: 32px; display: flex; flex-direction: column; justify-content: center; gap: 18px; position: relative;
+        }
+        .brand .logo { display: flex; align-items: center; gap: 12px; }
+        .brand .logo img { height: 64px; filter: drop-shadow(0 6px 18px rgba(0,0,0,.25)); border-radius: 8px; background: rgba(255,255,255,.1); padding: 6px; }
+        .brand h2 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: .5px; }
+        .brand p { margin: 0; opacity: .95; font-weight: 500; }
+        .brand .features { margin-top: 8px; display: grid; gap: 8px; font-size: 14px; opacity: .95; }
+        .brand .features i { width: 18px; }
+        .form { padding: 32px; display: grid; place-content: center; }
+        .card { width: 100%; max-width: 420px; }
+        h1 { margin: 0 0 16px; font-size: 24px; font-weight: 800; color: #0f172a; text-align: left; }
+        .form-group { display: grid; gap: 6px; margin-bottom: 12px; }
+        label { font-size: 13px; color: #334155; font-weight: 600; }
+        .form-input { width: 100%; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; transition: .2s; background: #fff; }
+        .form-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(14,165,233,.15); }
+        .btn { width: 100%; padding: 12px 14px; border: 0; border-radius: 10px; background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%); color: #fff; cursor: pointer; font-weight: 700; letter-spacing: .3px; box-shadow: 0 10px 20px rgba(14,165,233,.3); transition: transform .08s ease; }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+        .err { color: #b91c1c; font-size: 14px; margin: 10px 0 0; min-height: 18px; }
+        .meta { margin-top: 12px; font-size: 12px; color: #475569; }
+        @media (max-width: 920px) {
+            .shell { grid-template-columns: 1fr; }
+            .brand { padding: 24px; }
+            .form { padding: 24px; }
+            .brand .logo { justify-content: center; }
+            .brand h2, .brand p { text-align: center; }
+        }
+    </style>
+    <script>
+        async function onLogin(e) {
+            e.preventDefault();
+            const form = e.target;
+            const payload = { username: form.username.value.trim(), password: form.password.value.trim() };
+            const res = await fetch("{{ url_for('main.login') }}", { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const result = await res.json();
+            const errBox = document.getElementById('err');
+            if (result.success) {
+                window.location.href = result.redirect || "{{ url_for('main.attribution') }}";
+            } else {
+                errBox.textContent = result.error || 'Erreur de connexion';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="shell">
+        <div class="brand">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/Logo_sedima.png') }}" alt="Logo" />
+                <h2>Gestion Matériel IT</h2>
+            </div>
+            <p>Système de suivi des incidents, attributions et restitutions.</p>
+            <div class="features">
+                <div><i class="fas fa-check-circle"></i> Historique consultable et exportable</div>
+                <div><i class="fas fa-check-circle"></i> Signatures sur écran</div>
+                <div><i class="fas fa-check-circle"></i> Sécurité et traçabilité</div>
+            </div>
+        </div>
+        <div class="form">
+            <div class="card">
+                <h1>Connexion</h1>
+                <form onsubmit="onLogin(event)">
+                    <div class="form-group">
+                        <label>Nom d'utilisateur</label>
+                        <input class="form-input" name="username" placeholder="prenom.nom" autocomplete="username" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Mot de passe</label>
+                        <input class="form-input" type="password" name="password" placeholder="Votre mot de passe" autocomplete="current-password" required />
+                    </div>
+                    <button class="btn" type="submit"><i class="fas fa-right-to-bracket"></i> Se connecter</button>
+                    <div class="err" id="err"></div>
+                    <div class="meta">Besoin d'un compte ? Contactez l'administrateur.</div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

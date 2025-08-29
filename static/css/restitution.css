@@ -1,11 +1,11 @@
 /* ===== VARIABLES CSS ===== */
 :root {
-    --primary-color: #D97706;
-    --primary-hover: #B45309;
-    --primary-light: #FEF3C7;
-    --primary-lighter: #FFFBEB;
-    --text-dark: #92400E;
-    --text-gray: #6B7280;
+    --primary-color: #0EA5E9;
+    --primary-hover: #0284C7;
+    --primary-light: #E0F2FE;
+    --primary-lighter: #F0F9FF;
+    --text-dark: #0F172A;
+    --text-gray: #475569;
     --white: #FFFFFF;
     --gray-100: #F3F4F6;
     --gray-200: #E5E7EB;
@@ -15,6 +15,8 @@
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     --border-radius: 0.5rem;
     --transition: all 0.3s ease;
+    --restitution-accent: #0EA5E9;
+    --restitution-accent-light: #E0F2FE;
 }
 
 /* ===== RESET ET BASE ===== */
@@ -26,7 +28,7 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, var(--primary-lighter) 0%, #FFF8DC 100%);
+    background: linear-gradient(135deg, var(--primary-lighter) 0%, var(--primary-light) 100%);
     min-height: 100vh;
     line-height: 1.6;
 }
@@ -165,6 +167,34 @@ header p {
 }
 
 /* ===== FORMULAIRES ===== */
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-section {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+.form-section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-section-title i {
+    color: var(--primary-color);
+}
+
 .form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -225,7 +255,7 @@ header p {
 }
 
 .data-table thead {
-    background: linear-gradient(135deg, var(--primary-light) 0%, #FDE68A 100%);
+    background: linear-gradient(135deg, var(--primary-light) 0%, #BAE6FD 100%);
 }
 
 .data-table th {
@@ -274,7 +304,7 @@ header p {
 /* ===== BOUTONS ===== */
 .button-group {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 1rem;
     margin-top: 2rem;
     padding-top: 2rem;
@@ -352,20 +382,20 @@ header p {
 .file-upload-label {
     display: block;
     padding: 0.75rem 1rem;
-    background: var(--gray-100);
-    border: 2px dashed var(--gray-300);
+    background: var(--primary-lighter);
+    border: 2px dashed var(--primary-color);
     border-radius: var(--border-radius);
     text-align: center;
     cursor: pointer;
     transition: var(--transition);
     font-size: 0.875rem;
-    color: var(--text-gray);
+    color: var(--text-dark);
 }
 
 .file-upload-label:hover {
-    background: var(--primary-lighter);
+    background: var(--primary-color);
     border-color: var(--primary-color);
-    color: var(--text-dark);
+    color: var(--white);
 }
 
 /* ===== ANIMATIONS ===== */
@@ -398,6 +428,51 @@ header p {
     to {
         opacity: 1;
     }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* ===== EFFETS SPÉCIAUX RESTITUTION ===== */
+.restitution-badge {
+    display: inline-block;
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    animation: pulse 2s infinite;
+}
+
+.warning-box {
+    background: var(--primary-lighter);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.warning-box i {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+}
+
+.warning-box p {
+    color: var(--text-dark);
+    font-weight: 500;
+    margin: 0;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -441,29 +516,10 @@ header p {
     .data-table td {
         padding: 0.5rem;
     }
-}
-
-/* ===== EFFETS VISUELS SUPPLÉMENTAIRES ===== */
-.glow-effect {
-    position: relative;
-}
-
-.glow-effect::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(45deg, var(--primary-color), var(--primary-hover), var(--primary-color));
-    border-radius: calc(var(--border-radius) + 2px);
-    z-index: -1;
-    opacity: 0;
-    transition: var(--transition);
-}
-
-.glow-effect:hover::before {
-    opacity: 1;
+    
+    .form-section {
+        padding: 1rem;
+    }
 }
 
 /* ===== LOADING STATES ===== */
@@ -498,8 +554,8 @@ header p {
 }
 
 .error {
-    border-color: #EF4444 !important;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1) !important;
 }
 
 /* ===== SCROLLBAR PERSONNALISÉE ===== */

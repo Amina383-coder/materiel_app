@@ -1,7 +1,11 @@
 import mysql.connector
 from mysql.connector import Error
-from config import Config
+from dotenv import load_dotenv
+import os
 import logging
+
+# Charger .env
+load_dotenv()
 
 class Database:
     def __init__(self):
@@ -11,14 +15,18 @@ class Database:
     def connect(self):
         """Établir la connexion à la base de données MySQL"""
         try:
+            # Normaliser le mot de passe si valeur d'exemple
+            raw_password = os.getenv("DB_PASSWORD", "")
+            if raw_password in ("votre_mot_de_passe_mysql", "your_mysql_password", "votre-mot-de-passe", "changeme"):
+                raw_password = ""
+
             self.connection = mysql.connector.connect(
-                host=Config.DB_HOST,
-                user=Config.DB_USER,
-                password=Config.DB_PASSWORD,
-                database=Config.DB_NAME,
-                port=Config.DB_PORT,
-                charset='utf8mb4',
-                collation='utf8mb4_unicode_ci'
+                host=os.getenv("DB_HOST"),
+                user=os.getenv("DB_USER"),
+                password=raw_password,
+                database=os.getenv("DB_NAME"),
+                port=int(os.getenv("DB_PORT", 3306)),
+                charset='utf8mb4'
             )
             
             if self.connection.is_connected():
@@ -37,12 +45,17 @@ class Database:
         if self.connection and self.connection.is_connected():
             self.connection.close()
             logging.info("Connexion MySQL fermée")
+        self.connection = None
+        self.cursor = None
     
     def execute_query(self, query, params=None):
         """Exécuter une requête SQL"""
         try:
             if not self.connection or not self.connection.is_connected():
                 self.connect()
+            if not self.cursor:
+                logging.error("Curseur MySQL indisponible (connexion échouée)")
+                return None
             
             self.cursor.execute(query, params or ())
             
@@ -52,9 +65,13 @@ class Database:
                 self.connection.commit()
                 return self.cursor.rowcount
                 
-        except Error as e:
+        except Exception as e:
             logging.error(f"Erreur d'exécution de requête: {e}")
-            self.connection.rollback()
+            try:
+                if self.connection and self.connection.is_connected():
+                    self.connection.rollback()
+            except Exception:
+                pass
             return None
     
     def execute_many(self, query, params_list):
@@ -62,14 +79,21 @@ class Database:
         try:
             if not self.connection or not self.connection.is_connected():
                 self.connect()
+            if not self.cursor:
+                logging.error("Curseur MySQL indisponible (connexion échouée)")
+                return None
             
             self.cursor.executemany(query, params_list)
             self.connection.commit()
             return self.cursor.rowcount
             
-        except Error as e:
+        except Exception as e:
             logging.error(f"Erreur d'exécution multiple: {e}")
-            self.connection.rollback()
+            try:
+                if self.connection and self.connection.is_connected():
+                    self.connection.rollback()
+            except Exception:
+                pass
             return None
     
     def get_last_insert_id(self):

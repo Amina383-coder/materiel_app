@@ -8,6 +8,9 @@ class Config:
     DB_HOST = os.getenv('DB_HOST', 'localhost')
     DB_USER = os.getenv('DB_USER', 'root')
     DB_PASSWORD = os.getenv('DB_PASSWORD', '')
+    # Tolérer les valeurs d'exemple comme mot de passe vide
+    if DB_PASSWORD in ('votre_mot_de_passe_mysql', 'your_mysql_password', 'votre-mot-de-passe', 'changeme'):
+        DB_PASSWORD = ''
     DB_NAME = os.getenv('DB_NAME', 'materiel_it_db')
     DB_PORT = int(os.getenv('DB_PORT', 3306))
     
@@ -18,4 +21,4 @@ class Config:
     # Configuration uploads
     UPLOAD_FOLDER = 'uploads'
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf'}
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}

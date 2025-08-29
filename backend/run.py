@@ -10,9 +10,13 @@ logging.basicConfig(
 
 app = create_app()
 
-@app.before_first_request
-def initialize_database():
-    """Initialiser la connexion à la base de données au premier démarrage"""
+@app.teardown_appcontext
+def close_database(error):
+    """Fermer la connexion à la base de données à la fin de chaque requête"""
+    db.disconnect()
+
+if __name__ == '__main__':
+    # Initialiser la base de données au démarrage
     try:
         if db.connect():
             logging.info("Base de données initialisée avec succès")
@@ -20,15 +24,9 @@ def initialize_database():
             logging.error("Échec de l'initialisation de la base de données")
     except Exception as e:
         logging.error(f"Erreur lors de l'initialisation de la base de données: {e}")
-
-@app.teardown_appcontext
-def close_database(error):
-    """Fermer la connexion à la base de données à la fin de chaque requête"""
-    db.disconnect()
-
-if __name__ == '__main__':
+    
     app.run(
-        host='0.0.0.0',
+        host='localhost',
         port=5000,
         debug=True
     )

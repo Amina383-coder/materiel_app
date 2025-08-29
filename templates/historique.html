@@ -6,11 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Gestion Matériel IT - Historique</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="css/historique.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/historique.css') }}">
     <!-- jsPDF + AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <!-- html2canvas pour screenshot modal -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
@@ -18,23 +17,24 @@
     <div class="container">
         <header>
             <h1>
-                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f5064d23-f6fa-49e9-9428-c7d99f6f16a5.png"
-                    alt="Logo gestion matériel IT">
-                Gestion Matériel IT
+                <img src="{{ url_for('static', filename='images/Logo_sedima.png') }}" alt="Logo gestion matériel IT" width="120">                Gestion Matériel IT
             </h1>
-            <p>Système de suivi des attributions et restitutions</p>
+            <p>Système de suivi des incidents, attributions et restitutions</p>
         </header>
 
         <div class="main-card">
             <!-- Navigation -->
             <div class="nav-tabs">
-                <a href="index.html" class="tab-button">
+                <a href="{{ url_for('main.attribution') }}" class="tab-button">
                     <i class="fas fa-laptop"></i>Attribution
                 </a>
-                <a href="restitution.html" class="tab-button">
+                <a href="{{ url_for('main.restitution') }}" class="tab-button">
                     <i class="fas fa-undo"></i>Restitution
                 </a>
-                <a href="historique.html" class="tab-button active">
+                <a href="{{ url_for('main.incident') }}" class="tab-button" aria-label="Aller à l'incidence">
+                    <i class="fas fa-triangle-exclamation"></i>Incidence
+                </a>
+                <a href="{{ url_for('main.historique') }}" class="tab-button active">
                     <i class="fas fa-history"></i>Historique
                 </a>
             </div>
@@ -44,59 +44,85 @@
                 <h2 class="section-title">HISTORIQUE DES MATERIELS</h2>
 
                 <!-- Filtres -->
-                <div class="filters-section">
-                    <h3 class="form-section-title">
-                        <i class="fas fa-filter"></i>Filtres de recherche
-                    </h3>
-                    <div class="filters-grid">
+                <div class="filter-section">
+                    <h3>Filtres</h3>
+                    <div class="filter-grid">
                         <div class="filter-group">
-                            <label for="employe-input" class="filter-label">Nom de l'employé</label>
+                            <label for="employe-input">Employé</label>
                             <input type="text" id="employe-input" class="filter-input" oninput="filterHistorique()"
-                                placeholder="Tapez le nom de l'employé...">
+                                   placeholder="Rechercher par nom d'employé">
                         </div>
-
+                        
                         <div class="filter-group">
-                            <label for="service-input" class="filter-label">Service</label>
+                            <label for="service-input">Service</label>
                             <select id="service-input" class="filter-select" onchange="filterHistorique()">
-                                <option value="">Tous les services</option>
-                                <option value="Direction générale">Direction générale</option>
-                                <option value="Maintenance">Maintenance</option>
-                                <option value="Contrôle de gestion">Contrôle de gestion</option>
-                                <option value="Finance et comptabilité">Finance et comptabilité</option>
-                                <option value="Performance">Performance</option>
-                                <option value="Supply chain">Supply chain</option>
-                                <option value="QHSE">QHSE</option>
-                                <option value="Technique">Technique</option>
-                                <option value="Planification">Planification</option>
-                                <option value="Informatique">Informatique</option>
-                                <option value="Recouvrement">Recouvrement</option>
-                                <option value="Commercial">Commercial</option>
+                                    <option value="">Sélectionner le service...</option>
+                                    <option value="Direction générale">Direction générale</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="Contrôle de gestion">Contrôle de gestion</option>
+                                    <option value="Finance et comptabilité">Finance et comptabilité</option>
+                                    <option value="Performance">Performance</option>
+                                    <option value="Supply chain">Supply chain</option>
+                                    <option value="QHSE">QHSE</option>
+                                    <option value="Technique">Technique</option>
+                                    <option value="Industrie">Industrie</option>
+                                    <option value="Informatique">Informatique</option>
+                                    <option value="Juridique">Juridique</option>
+                                    <option value="Commercial">Marketing et commercial</option>
                             </select>
                         </div>
 
                         <div class="filter-group">
-                            <label for="type-materiel" class="filter-label">Type de matériel</label>
-                            <input type="text" id="type-materiel" class="filter-input" oninput="filterHistorique()"
-                                placeholder="Ex: Ordinateur, Imprimante...">
+                            <label for="type-operation">Type d'opération</label>
+                            <select id="type-operation" class="filter-select" onchange="filterHistorique()">
+                                <option value="">Tous les types</option>
+                                <option value="attribution">Attribution</option>
+                                <option value="restitution">Restitution</option>
+                                <option value="incident">Incident</option>
+                            </select>
                         </div>
-
+                        
                         <div class="filter-group">
-                            <label for="serie-input" class="filter-label">Numéro de série</label>
+                            <label for="type-materiel">Type de matériel</label>
+                            <select id="type-materiel" class="filter-select" onchange="filterHistorique()">
+                                                    <option value="">Sélectionner...</option>
+                                                    <option value="ordinateur_portable">Ordinateur portable</option>
+                                                    <option value="ordinateur_bureau">Ordinateur de bureau</option>
+                                                    <option value="telephone">Téléphone IP</option>
+                                                    <option value="smartphone">Smartphone</option>
+                                                    <option value="cartouche">Cartouche</option>
+                                                    <option value="imprimantes">Imprimantes</option>
+                                                    <option value="accessoires">Accessoires</option>
+                                                    <option value="ecran">Écran</option>
+                            </select>
+                            
+
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="serie-input">Numéro de série</label>
                             <input type="text" id="serie-input" class="filter-input" oninput="filterHistorique()"
-                                placeholder="Tapez le numéro de série...">
+                                   placeholder="Rechercher par série">
                         </div>
-
+                        
                         <div class="filter-group">
-                            <label class="filter-label">Période</label>
-                            <div class="date-range">
-                                <div class="filter-group">
-                                    <input type="date" id="date-debut" class="filter-input" onchange="filterHistorique()" placeholder="Date début">
-                                </div>
-                                <div class="filter-group">
-                                    <input type="date" id="date-fin" class="filter-input" onchange="filterHistorique()" placeholder="Date fin">
-                                </div>
-                            </div>
+                            <label for="date-debut">Date début</label>
+                            <input type="date" id="date-debut" class="filter-input" onchange="filterHistorique()" placeholder="Date début">
                         </div>
+                        
+                        <div class="filter-group">
+                            <label for="date-fin">Date fin</label>
+                            <input type="date" id="date-fin" class="filter-input" onchange="filterHistorique()" placeholder="Date fin">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button id="refresh-btn" class="btn btn-primary" onclick="refreshHistorique()" aria-label="Rafraîchir l'historique">
+                            <i class="fas fa-sync-alt"></i> Rafraîchir
+                        </button>
+                        <button id="clear-filters-btn" class="btn btn-secondary" onclick="clearFilters()" aria-label="Effacer les filtres">
+                            <i class="fas fa-times"></i> Effacer les filtres
+                        </button>
                     </div>
                 </div>
 
@@ -105,6 +131,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
+                                <th>N° Fiche</th>
                                 <th>Type d'Opération</th>
                                 <th>Nom Employé</th>
                                 <th>Service</th>
@@ -115,14 +142,13 @@
                             </tr>
                         </thead>
                         <tbody id="historique-body">
-                            <!-- Les données JS iront ici -->
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Bouton export -->
                 <div class="button-group">
-                    <button id="export-historique-btn" class="export-button">
+                    <button id="export-historique-btn" class="export-button" aria-label="Exporter l'historique en PDF">
                         <i class="fas fa-file-pdf"></i>Exporter l'historique en PDF
                     </button>
                 </div>
@@ -139,11 +165,10 @@
             </div>
             <div class="modal-body">
                 <div id="modal-content">
-                    <!-- Contenu dynamique -->
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="export-details-pdf" class="export-button">
+                <button id="export-details-pdf" class="export-button" aria-label="Exporter les détails en PDF">
                     <i class="fas fa-file-pdf"></i>Exporter les détails en PDF
                 </button>
             </div>
@@ -151,15 +176,24 @@
     </div>
 
     <script>
+        const API_BASE = 'http://localhost:5000/api';
         // Tableau global filtré, accessible aux fonctions
         let filteredHistoriqueData = [];
+
+        function formatDateFr(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            if (isNaN(d)) return dateStr;
+            return d.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
 
         // Fonction pour filtrer et afficher les données
         async function filterHistorique() {
             const employeInput = document.getElementById('employe-input').value;
             const serviceSelect = document.getElementById('service-input').value;
-            const typeMateriel = document.getElementById('type-materiel').value;
+            const typeMateriel = (document.getElementById('type-materiel')?.value) || '';
             const serieInput = document.getElementById('serie-input').value;
+            const typeOperation = document.getElementById('type-operation').value;
             const dateDebut = document.getElementById('date-debut').value;
             const dateFin = document.getElementById('date-fin').value;
 
@@ -168,12 +202,15 @@
             if (employeInput) params.append('employe', employeInput);
             if (serviceSelect) params.append('service', serviceSelect);
             if (typeMateriel) params.append('type_materiel', typeMateriel);
+            if (typeOperation) params.append('type_operation', typeOperation);
             if (serieInput) params.append('serie', serieInput);
             if (dateDebut) params.append('date_debut', dateDebut);
             if (dateFin) params.append('date_fin', dateFin);
 
             try {
-                const response = await fetch(`/api/historique?${params.toString()}`);
+                // Anti-cache
+                params.append('_', Date.now().toString());
+                const response = await fetch(`${API_BASE}/historique?${params.toString()}`, { cache: 'no-store' });
                 const result = await response.json();
 
                 if (result.success) {
@@ -189,6 +226,50 @@
             }
         }
 
+        // Fonction pour rafraîchir l'historique
+        async function refreshHistorique() {
+            const refreshBtn = document.getElementById('refresh-btn');
+            const originalText = refreshBtn.innerHTML;
+            
+            try {
+                // Afficher l'animation de chargement
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rafraîchissement...';
+                refreshBtn.disabled = true;
+                
+                // Recharger les données
+                await filterHistorique();
+                
+                // Afficher un message de succès temporaire
+                refreshBtn.innerHTML = '<i class="fas fa-check"></i> Mis à jour !';
+                setTimeout(() => {
+                    refreshBtn.innerHTML = originalText;
+                    refreshBtn.disabled = false;
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Erreur lors du rafraîchissement:', error);
+                refreshBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erreur';
+                setTimeout(() => {
+                    refreshBtn.innerHTML = originalText;
+                    refreshBtn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        // Fonction pour effacer tous les filtres
+        function clearFilters() {
+            document.getElementById('employe-input').value = '';
+            document.getElementById('service-input').value = '';
+            const typeMaterielResetEl = document.getElementById('type-materiel');
+            if (typeMaterielResetEl) typeMaterielResetEl.value = '';
+            document.getElementById('serie-input').value = '';
+            document.getElementById('date-debut').value = '';
+            document.getElementById('date-fin').value = '';
+            
+            // Recharger l'historique sans filtres
+            filterHistorique();
+        }
+
         // Affiche les données dans le tableau
         function displayHistorique(data) {
             const tbody = document.getElementById('historique-body');
@@ -197,23 +278,35 @@
             if (data.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="empty-state">
+                        <td colspan="8" class="empty-state">
                             <i class="fas fa-search"></i>
                             <h3>Aucune donnée trouvée</h3>
-                            <p>Aucune opération ne correspond aux critères de recherche</p>
+                            <p>Aucune opération ou incident ne correspond aux critères de recherche</p>
                         </td>
                     </tr>`;
                 return;
             }
 
             data.forEach((op, index) => {
-                const materielDisplay = `${op.type_materiel || '-'} - ${op.modele || '-'}`;
-                const serieDisplay = op.numero_serie || '-';
-                const badgeClass = op.type_operation === 'attribution' ? 'badge-attribution' : 'badge-restitution';
-                const typeDisplay = op.type_operation === 'attribution' ? 'Attribution' : 'Restitution';
+                let materielDisplay, serieDisplay, badgeClass, typeDisplay;
+                
+                if (op.source_type === 'incident') {
+                    // Affichage pour les incidents
+                    materielDisplay = op.modele || 'Non spécifié';
+                    serieDisplay = op.numero_serie || 'Non spécifié';
+                    badgeClass = 'badge-incident';
+                    typeDisplay = 'Incident';
+                } else {
+                    // Affichage pour les opérations (attributions et restitutions)
+                    materielDisplay = `${op.type_materiel || '-'} - ${op.modele || '-'}`;
+                    serieDisplay = op.numero_serie || '-';
+                    badgeClass = op.type_operation === 'attribution' ? 'badge-attribution' : 'badge-restitution';
+                    typeDisplay = op.type_operation === 'attribution' ? 'Attribution' : 'Restitution';
+                }
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
+                    <td>${op.numero_fiche || "-"}</td>
                     <td>
                         <span class="badge ${badgeClass}">${typeDisplay}</span>
                     </td>
@@ -221,9 +314,9 @@
                     <td>${op.service_nom || "-"}</td>
                     <td>${materielDisplay}</td>
                     <td>${serieDisplay}</td>
-                    <td>${op.date_operation || "-"}</td>
+                    <td>${formatDateFr(op.date_operation)}</td>
                     <td>
-                        <button class="action-button" onclick="showDetails(${op.id})">
+                        <button class="action-button" onclick="showDetails(${op.id}, '${op.source_type}')">
                             <i class="fas fa-eye"></i> Détails
                         </button>
                     </td>
@@ -232,100 +325,171 @@
             });
         }
 
-        // Affiche la modale détails
-        async function showDetails(operationId) {
+        // Affiche détails
+        async function showDetails(operationId, sourceType) {
             try {
-                const response = await fetch(`/api/operation/${operationId}`);
-                const result = await response.json();
+                let response, result;
+                
+                if (sourceType === 'incident') {
+                    // Récupérer les détails de l'incident
+                    response = await fetch(`${API_BASE}/incident/${operationId}`);
+                } else {
+                    // Récupérer les détails de l'opération
+                    response = await fetch(`${API_BASE}/operation/${operationId}`);
+                }
+                
+                result = await response.json();
 
                 if (!result.success) {
                     alert('Erreur lors de la récupération des détails: ' + result.error);
                     return;
                 }
 
-                const operation = result.data.operation;
-                const signatures = result.data.signatures;
                 const modalContent = document.getElementById('modal-content');
                 const modalTitle = document.getElementById('modal-title');
                 const detailsModal = document.getElementById('details-modal');
 
-                const typeDisplay = operation.type_operation === 'attribution' ? 'Attribution' : 'Restitution';
-                modalTitle.textContent = `Détails de l'opération : ${typeDisplay}`;
+                if (sourceType === 'incident') {
+                    // Affichage des détails d'un incident
+                    const incident = result.data.incident;
+                    modalTitle.textContent = `Détails de l'incident : ${incident.numero_fiche || 'N/A'}`;
 
-                let contentHtml = `
-                    <h2 class="section-title">${operation.type_operation === "attribution" ? "Formulaire d'attribution" : "Formulaire de restitution"}</h2>
-                    <table class="details-table">
-                        <tbody>
-                            <tr><th>Type d'opération</th><td>${typeDisplay}</td></tr>
-                            <tr><th>Nom de l'employé</th><td>${operation.employe_nom || '-'}</td></tr>
-                            <tr><th>Service</th><td>${operation.service_nom || '-'}</td></tr>
-                            <tr><th>Date de l'opération</th><td>${operation.date_operation || '-'}</td></tr>
-                            <tr><th>Type matériel</th><td>${operation.type_materiel || '-'}</td></tr>
-                            <tr><th>Modèle</th><td>${operation.modele || '-'}</td></tr>
-                            <tr><th>N° Série</th><td>${operation.numero_serie || '-'}</td></tr>
-                `;
-
-                if (operation.type_operation === "attribution") {
-                    contentHtml += `
-                        <tr><th>Date Remise</th><td>${operation.date_remise || '-'}</td></tr>
+                    let contentHtml = `
+                        <h2 class="section-title">Fiche de signalisation d'incident</h2>
+                        <table class="details-table">
+                            <tbody>
+                                <tr><th>Date de l'incident</th><td>${formatDateFr(incident.date_operation)}</td></tr>
+                                <tr><th>Déclarant</th><td>${incident.declarant_nom || '-'}</td></tr>
+                                <tr><th>Téléphone</th><td>${incident.telephone || '-'}</td></tr>
+                                <tr><th>Email</th><td>${incident.email || '-'}</td></tr>
+                                <tr><th>Service</th><td>${incident.service_nom || '-'}</td></tr>
+                                <tr><th>Numéro de série du matériel</th><td>${incident.numero_serie_actif || '-'}</td></tr>
                     `;
+
+                                // Matériels touchés
+            if (incident.actifs && incident.actifs.length > 0) {
+                contentHtml += `<tr><th>Matériels touchés</th><td>${incident.actifs.join(', ')}</td></tr>`;
+                    }
+
+                    // Natures de l'incident
+                    if (incident.natures && incident.natures.length > 0) {
+                        contentHtml += `<tr><th>Natures de l'incident</th><td>${incident.natures.join(', ')}</td></tr>`;
+                    }
+
+                    // Autres informations
+                    if (incident.autres_infos) {
+                        contentHtml += `<tr><th>Autres informations</th><td>${incident.autres_infos}</td></tr>`;
+                    }
+
+                    contentHtml += `</tbody></table>`;
+
+                    // Signature PNG si disponible
+                    if (incident.signature) {
+                        contentHtml += `
+                            <h3 class="form-section-title">
+                                <i class="fas fa-image"></i>Signature PNG
+                            </h3>
+                            <div class="signature-section">
+                                <img src="${incident.signature}" alt="Signature" style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px;">
+                            </div>
+                        `;
+                    } else {
+                        contentHtml += `
+                            <h3 class="form-section-title">
+                                <i class="fas fa-image"></i>Signature PNG
+                            </h3>
+                            <div class="signature-section">
+                                <p style="color: #666; font-style: italic;">Aucune signature fournie</p>
+                            </div>
+                        `;
+                    }
+
+                    modalContent.innerHTML = contentHtml;
+
                 } else {
-                    contentHtml += `
-                        <tr><th>Date Restitution</th><td>${operation.date_restitution || '-'}</td></tr>
+                    // Affichage des détails d'une opération (code existant)
+                    const operation = result.data.operation;
+                    const signatures = result.data.signatures;
+
+                    let typeDisplay = operation.type_operation === 'attribution' ? 'Attribution' : 'Restitution';
+                    modalTitle.textContent = `Détails de l'opération : ${typeDisplay} - ${operation.numero_fiche || 'N/A'}`;
+
+                    let contentHtml = `
+                        <h2 class="section-title">${operation.type_operation === "attribution" ? "Formulaire d'attribution" : "Formulaire de restitution"}</h2>
+                        <table class="details-table">
+                            <tbody>
+                                <tr><th>Type d'opération</th><td>${typeDisplay}</td></tr>
+                                <tr><th>Nom de l'employé</th><td>${operation.employe_nom || '-'}</td></tr>
+                                <tr><th>Service</th><td>${operation.service_nom || '-'}</td></tr>
+                                <tr><th>Date de l'opération</th><td>${formatDateFr(operation.date_operation)}</td></tr>
+                                <tr><th>Type matériel</th><td>${operation.type_materiel || '-'}</td></tr>
+                                <tr><th>Modèle</th><td>${operation.modele || '-'}</td></tr>
+                                <tr><th>N° Série</th><td>${operation.numero_serie || '-'}</td></tr>
                     `;
+
+                    if (operation.type_operation === "attribution") {
+                        contentHtml += `
+                            <tr><th>Date Remise</th><td>${formatDateFr(operation.date_remise)}</td></tr>
+                        `;
+                    } else {
+                        contentHtml += `
+                            <tr><th>Date Restitution</th><td>${formatDateFr(operation.date_restitution)}</td></tr>
+                        `;
+                    }
+
+                    contentHtml += `</tbody></table>`;
+
+                    // Tableau signatures
+                    contentHtml += `
+                        <h3 class="form-section-title">
+                            <i class="fas fa-signature"></i>Signatures
+                        </h3>
+                        <table class="details-table">
+                            <thead>
+                                <tr>
+                                    <th>Rôle</th>
+                                    <th>Nom</th>
+                                    <th>Fonction</th>
+                                    <th>Date</th>
+                                    <th>Signature</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    // Organiser les signatures par type
+                    const signaturesByType = {};
+                    signatures.forEach(sig => {
+                        signaturesByType[sig.type_signature] = sig;
+                    });
+
+                    const signatureTypes = [
+                        { key: 'redaction', label: 'Rédaction' },
+                        { key: 'validation', label: 'Validation' },
+                        { key: 'destinataire', label: 'Destinataire' }
+                    ];
+
+                    signatureTypes.forEach(sigType => {
+                        const sig = signaturesByType[sigType.key];
+                        contentHtml += `
+                            <tr>
+                                <td>${sigType.label}</td>
+                                <td>${sig ? sig.nom : '-'}</td>
+                                <td>${sig ? sig.fonction : '-'}</td>
+                                <td>${sig ? sig.date_signature : '-'}</td>
+                                <td>${sig && sig.fichier_signature ? `<img src="${sig.fichier_signature}" class="signature-image">` : '-'}</td>
+                            </tr>
+                        `;
+                    });
+
+                    contentHtml += `
+                            </tbody>
+                        </table>
+                    `;
+
+                    modalContent.innerHTML = contentHtml;
                 }
 
-                contentHtml += `</tbody></table>`;
-
-                // Tableau signatures
-                contentHtml += `
-                    <h3 class="form-section-title">
-                        <i class="fas fa-signature"></i>Signatures
-                    </h3>
-                    <table class="details-table">
-                        <thead>
-                            <tr>
-                                <th>Rôle</th>
-                                <th>Nom</th>
-                                <th>Fonction</th>
-                                <th>Date</th>
-                                <th>Signature</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                // Organiser les signatures par type
-                const signaturesByType = {};
-                signatures.forEach(sig => {
-                    signaturesByType[sig.type_signature] = sig;
-                });
-
-                const signatureTypes = [
-                    { key: 'redaction', label: 'Rédaction' },
-                    { key: 'validation', label: 'Validation' },
-                    { key: 'destinataire', label: 'Destinataire' }
-                ];
-
-                signatureTypes.forEach(sigType => {
-                    const sig = signaturesByType[sigType.key];
-                    contentHtml += `
-                        <tr>
-                            <td>${sigType.label}</td>
-                            <td>${sig ? sig.nom : '-'}</td>
-                            <td>${sig ? sig.fonction : '-'}</td>
-                            <td>${sig ? sig.date_signature : '-'}</td>
-                            <td>${sig && sig.fichier_signature ? `<img src="${sig.fichier_signature}" class="signature-image">` : '-'}</td>
-                        </tr>
-                    `;
-                });
-
-                contentHtml += `
-                        </tbody>
-                    </table>
-                `;
-
-                modalContent.innerHTML = contentHtml;
                 detailsModal.classList.add('show');
 
             } catch (error) {
@@ -346,69 +510,53 @@
             }
         });
 
-        // Export PDF historique complet (toute la page)
+        // Export PDF historique 
         async function exportHistoriqueToPdf() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
+            const doc = new jsPDF({ unit: 'pt' });
             try {
-                // Masquer les éléments non nécessaires pour la capture
-                const exportBtn = document.getElementById('export-historique-btn');
-                const originalDisplay = exportBtn.style.display;
-                exportBtn.style.display = 'none';
+                const rows = filteredHistoriqueData.map(op => ([
+                    op.numero_fiche || '-',
+                    op.type_operation === 'incident' ? 'Incident' : (op.type_operation === 'attribution' ? 'Attribution' : 'Restitution'),
+                    op.employe_nom || '-',
+                    op.service_nom || '-',
+                    (op.type_operation === 'incident' ? (op.type_materiel || 'Incident') : (op.type_materiel || '-')),
+                    op.modele || '-',
+                    op.numero_serie || '-',
+                    formatDateFr(op.date_operation)
+                ]));
 
-                // Attendre un peu pour que le changement soit pris en compte
-                await new Promise(resolve => setTimeout(resolve, 100));
+                const header = [['N° Fiche', 'Type', 'Employé', 'Service', 'Type matériel', 'Modèle', 'N° Série', 'Date']];
 
-                // Capturer toute la page
-                const canvas = await html2canvas(document.body, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    scrollY: 0,
-                    scrollX: 0,
-                    windowWidth: document.documentElement.scrollWidth,
-                    windowHeight: document.documentElement.scrollHeight
+                
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(15, 23, 42); // text-dark
+                doc.setFontSize(16);
+                doc.text("Historique du matériel", 40, 40);
+
+                doc.autoTable({
+                    head: header,
+                    body: rows,
+                    startY: 60,
+                    styles: { fontSize: 10, cellPadding: 6, textColor: [15, 23, 42] },
+                    headStyles: { fillColor: [14, 165, 233], textColor: 255 }, // primary-color
+                    alternateRowStyles: { fillColor: [240, 249, 255] }, // primary-lighter
+                    theme: 'grid',
+                    margin: { left: 40, right: 40 },
+                    tableLineColor: [229, 231, 235], // gray-200
+                    tableLineWidth: 0.5
                 });
 
-                // Restaurer l'affichage du bouton
-                exportBtn.style.display = originalDisplay;
-
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 210; // A4 width in mm
-                const pageHeight = 295; // A4 height in mm
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight;
-
-                let position = 0;
-
-                // Ajouter la première page
-                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-
-                // Ajouter des pages supplémentaires si nécessaire
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    doc.addPage();
-                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-
-                doc.save("historique_materiel_complet.pdf");
-
+                doc.save('historique_materiel.pdf');
             } catch (error) {
                 console.error('Erreur lors de l\'export PDF:', error);
                 alert('Erreur lors de l\'export PDF. Veuillez réessayer.');
-                
-                // Restaurer l'affichage du bouton en cas d'erreur
-                const exportBtn = document.getElementById('export-historique-btn');
-                exportBtn.style.display = '';
             }
         }
 
         document.getElementById('export-historique-btn').addEventListener('click', exportHistoriqueToPdf);
 
-        // Export PDF détails modal (capture d'écran du contenu modal)
+        // Export PDF détails modal
         document.getElementById('export-details-pdf').addEventListener('click', async () => {
             const modal = document.getElementById('details-modal');
             const modalBox = modal.querySelector('.modal-content');
@@ -424,11 +572,26 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
 
-                const canvas = await html2canvas(modalBox, { 
+                // Étendre temporairement la modale pour capturer tout le contenu
+                const originalMaxHeight = modalBox.style.maxHeight;
+                const originalOverflow = modalBox.style.overflow;
+                const originalHeight = modalBox.style.height;
+                modalBox.style.maxHeight = 'none';
+                modalBox.style.overflow = 'visible';
+                modalBox.style.height = 'auto';
+
+                const canvas = await html2canvas(modalBox, {
                     scale: 2,
                     useCORS: true,
-                    allowTaint: true
+                    allowTaint: true,
+                    scrollX: -window.scrollX,
+                    scrollY: -window.scrollY,
                 });
+
+                // Restaurer le style de la modale
+                modalBox.style.maxHeight = originalMaxHeight;
+                modalBox.style.overflow = originalOverflow;
+                modalBox.style.height = originalHeight;
                 const imgData = canvas.toDataURL('image/png');
                 const imgWidth = 210; // A4 width in mm
                 const pageHeight = 295; // A4 height in mm

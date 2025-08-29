@@ -6,29 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Gestion Matériel IT - Restitution</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/restitution.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/restitution.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}" />
 </head>
 
 <body>
     <div class="container">
         <header>
             <h1>
-                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f5064d23-f6fa-49e9-9428-c7d99f6f16a5.png" alt="Logo gestion matériel IT">
-                Gestion Matériel IT
+                <img src="{{ url_for('static', filename='images/Logo_sedima.png') }}" alt="Logo gestion matériel IT" width="120">                Gestion Matériel IT
             </h1>
-            <p>Système de suivi des attributions et restitutions</p>
+            <p>Système de suivi des incidents, attributions et restitutions</p>
         </header>
 
         <div class="main-card">
             <!-- Navigation -->
             <div class="nav-tabs">
-                <a href="index.html" class="tab-button">
+                <a href="{{ url_for('main.attribution') }}" class="tab-button" aria-label="Aller à l'attribution" tabindex="0">
                     <i class="fas fa-laptop"></i>Attribution
                 </a>
-                <a href="restitution.html" class="tab-button active">
+                <a href="{{ url_for('main.restitution') }}" class="tab-button active" aria-label="Aller à la restitution" tabindex="0">
                     <i class="fas fa-undo"></i>Restitution
                 </a>
-                <a href="historique.html" class="tab-button">
+                <a href="{{ url_for('main.incident') }}" class="tab-button" aria-label="Aller à l'incidence" tabindex="0">
+                    <i class="fas fa-triangle-exclamation"></i>Incidence
+                </a>
+                <a href="{{ url_for('main.historique') }}" class="tab-button" aria-label="Voir l'historique" tabindex="0">
                     <i class="fas fa-history"></i>Historique
                 </a>
             </div>
@@ -39,6 +42,12 @@
                 
                 <form id="form-restitution" enctype="multipart/form-data">
                     <div class="form-container">
+                        <!-- Numéro de fiche -->
+                        <div class="form-section">
+                            <h3 class="form-section-title"><i class="fas fa-hashtag"></i>Numéro de fiche</h3>
+                            <input type="text" id="restitution-numero-fiche" class="form-input" readonly placeholder="Généré automatiquement après enregistrement" />
+                        </div>
+
                         <!-- Informations employé -->
                         <div class="form-section">
                             <h3 class="form-section-title">
@@ -52,7 +61,7 @@
                                 <div class="form-group">
                                     <label for="attribution-service" class="form-label">Sélectionner le service</label>
                                     <select id="attribution-service" name="service" class="form-select" required>
-                                        <option value="">Choisir un service...</option>
+                                        <option value="">Sélectionner le service...</option>
                                         <option value="Direction générale">Direction générale</option>
                                         <option value="Maintenance">Maintenance</option>
                                         <option value="Contrôle de gestion">Contrôle de gestion</option>
@@ -61,10 +70,10 @@
                                         <option value="Supply chain">Supply chain</option>
                                         <option value="QHSE">QHSE</option>
                                         <option value="Technique">Technique</option>
-                                        <option value="Planification">Planification</option>
+                                        <option value="Industrie">Industrie</option>
                                         <option value="Informatique">Informatique</option>
-                                        <option value="Recouvrement">Recouvrement</option>
-                                        <option value="Commercial">Commercial</option>
+                                        <option value="Juridique">Juridique</option>
+                                        <option value="Commercial">Marketing et commercial</option>
                                     </select>
                                 </div>
                             </div>
@@ -92,10 +101,12 @@
                                                     <option value="">Sélectionner...</option>
                                                     <option value="ordinateur_portable">Ordinateur portable</option>
                                                     <option value="ordinateur_bureau">Ordinateur de bureau</option>
-                                                    <option value="ecran">Écran</option>
-                                                    <option value="telephone">Téléphone</option>
-                                                    <option value="tablette">Tablette</option>
+                                                    <option value="telephone">Téléphone IP</option>
+                                                    <option value="smartphone">Smartphone</option>
+                                                    <option value="cartouche">Cartouche</option>
+                                                    <option value="imprimantes">Imprimantes</option>
                                                     <option value="accessoires">Accessoires</option>
+                                                    <option value="ecran">Écran</option>
                                                 </select>
                                             </td>
                                             <td>
@@ -133,39 +144,42 @@
                                                 <input type="text" name="redacteur_nom" placeholder="Nom" class="form-input" required>
                                                 <input type="text" name="redacteur_fonction" placeholder="Fonction" class="form-input" required>
                                                 <input type="date" name="redacteur_date" class="form-input" required>
-                                                <div class="file-upload">
-                                                    <input type="file" name="redacteur_signature" accept="image/*" required>
-                                                    <label class="file-upload-label">
-                                                        <i class="fas fa-upload"></i> Signature rédacteur
-                                                    </label>
+                                                <label class="form-label">Signature rédacteur</label>
+                                                <canvas id="sig2-redaction" width="320" height="120" style="border:1px solid #e5e7eb;border-radius:8px;background:#fff;width:100%;max-width:320px;"></canvas>
+                                                <div class="button-group" style="justify-content:flex-start;margin-top:8px;">
+                                                    <button type="button" class="btn btn-secondary" id="clear-sig2-redaction"><i class="fas fa-eraser"></i>Effacer</button>
                                                 </div>
                                             </td>
                                             <td>
                                                 <input type="text" name="validateur_nom" placeholder="Nom" class="form-input" required>
                                                 <input type="text" name="validateur_fonction" placeholder="Fonction" class="form-input" required>
                                                 <input type="date" name="validateur_date" class="form-input" required>
-                                                <div class="file-upload">
-                                                    <input type="file" name="validation_signature" accept="image/*" required>
-                                                    <label class="file-upload-label">
-                                                        <i class="fas fa-upload"></i> Signature validation
-                                                    </label>
+                                                <label class="form-label">Signature validation</label>
+                                                <canvas id="sig2-validation" width="320" height="120" style="border:1px solid #e5e7eb;border-radius:8px;background:#fff;width:100%;max-width:320px;"></canvas>
+                                                <div class="button-group" style="justify-content:flex-start;margin-top:8px;">
+                                                    <button type="button" class="btn btn-secondary" id="clear-sig2-validation"><i class="fas fa-eraser"></i>Effacer</button>
                                                 </div>
                                             </td>
                                             <td>
                                                 <input type="text" name="destinataire_nom" placeholder="Nom" class="form-input" required>
                                                 <input type="text" name="destinataire_fonction" placeholder="Fonction" class="form-input" required>
                                                 <input type="date" name="destinataire_date" class="form-input" required>
-                                                <div class="file-upload">
-                                                    <input type="file" name="destinataire_signature" accept="image/*" required>
-                                                    <label class="file-upload-label">
-                                                        <i class="fas fa-upload"></i> Signature destinataire
-                                                    </label>
+                                                <label class="form-label">Signature destinataire</label>
+                                                <canvas id="sig2-destinataire" width="320" height="120" style="border:1px solid #e5e7eb;border-radius:8px;background:#fff;width:100%;max-width:320px;"></canvas>
+                                                <div class="button-group" style="justify-content:flex-start;margin-top:8px;">
+                                                    <button type="button" class="btn btn-secondary" id="clear-sig2-destinataire"><i class="fas fa-eraser"></i>Effacer</button>
                                                 </div>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+
+                        <!-- Remarque -->
+                        <div class="form-section">
+                            <h3 class="form-section-title"><i class="fas fa-comment"></i>Remarque</h3>
+                            <textarea id="restitution-remarque" name="remarque" class="form-input" rows="3" placeholder="Votre remarque..."></textarea>
                         </div>
 
                         <!-- Boutons d'action -->
@@ -184,6 +198,17 @@
     </div>
 
     <script>
+        const API_BASE = 'http://localhost:5000/api';
+        function generateNumeroFiche(prefix) {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const h = String(now.getHours()).padStart(2, '0');
+            const i = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            return `${prefix}-${y}${m}${d}-${h}${i}${s}`;
+        }
         // Fonction utilitaire pour convertir un fichier en Base64
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
@@ -210,15 +235,42 @@
             });
         });
 
-        // Fonction pour convertir un fichier en base64
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
+        let numeroFiche = null;
+        function makeSignaturePad(canvasId, clearBtnId) {
+            const canvas = document.getElementById(canvasId);
+            const clearBtn = document.getElementById(clearBtnId);
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            let hasStroke = false;
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            };
+            const start = (e) => { drawing = true; hasStroke = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); };
+            const move = (e) => { if (!drawing) return; const p = getPos(e); ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#111827'; ctx.lineTo(p.x, p.y); ctx.stroke(); };
+            const end = () => { drawing = false; };
+            canvas.addEventListener('mousedown', start);
+            canvas.addEventListener('mousemove', move);
+            window.addEventListener('mouseup', end);
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); start(e); });
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); });
+            canvas.addEventListener('touchend', (e) => { e.preventDefault(); end(); });
+            clearBtn.addEventListener('click', () => { ctx.clearRect(0, 0, canvas.width, canvas.height); hasStroke = false; });
+            return { canvas, ctx, has: () => hasStroke, toDataURL: () => canvas.toDataURL('image/png') };
         }
+
+        let pad2Redaction, pad2Validation, pad2Destinataire;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            numeroFiche = generateNumeroFiche('RST');
+            const numInput = document.getElementById('restitution-numero-fiche');
+            if (numInput) numInput.value = numeroFiche;
+            pad2Redaction = makeSignaturePad('sig2-redaction', 'clear-sig2-redaction');
+            pad2Validation = makeSignaturePad('sig2-validation', 'clear-sig2-validation');
+            pad2Destinataire = makeSignaturePad('sig2-destinataire', 'clear-sig2-destinataire');
+        });
 
         // Gestion du formulaire de restitution
         document.getElementById('form-restitution').addEventListener('submit', async function(e) {
@@ -255,21 +307,10 @@
                     }
                 });
 
-                // Récupérer les signatures
-                const signatureRedacteur = document.querySelector('input[name="redacteur_signature"]').files[0];
-                const signatureValidation = document.querySelector('input[name="validation_signature"]').files[0];
-                const signatureDestinataire = document.querySelector('input[name="destinataire_signature"]').files[0];
-
-                // Vérifier que toutes les signatures sont présentes
-                if (!signatureRedacteur || !signatureValidation || !signatureDestinataire) {
-                    alert('Veuillez télécharger toutes les signatures requises.');
-                    return;
-                }
-
-                // Convertir les signatures en base64
-                const signatureRedacteurBase64 = await fileToBase64(signatureRedacteur);
-                const signatureValidationBase64 = await fileToBase64(signatureValidation);
-                const signatureDestinataireBase64 = await fileToBase64(signatureDestinataire);
+                // Signatures via canvas
+                const signatureRedacteurBase64 = pad2Redaction && pad2Redaction.has() ? pad2Redaction.toDataURL() : null;
+                const signatureValidationBase64 = pad2Validation && pad2Validation.has() ? pad2Validation.toDataURL() : null;
+                const signatureDestinataireBase64 = pad2Destinataire && pad2Destinataire.has() ? pad2Destinataire.toDataURL() : null;
 
                 // Préparer les données pour l'envoi
                 const data = {
@@ -295,11 +336,12 @@
                         redaction: signatureRedacteurBase64,
                         validation: signatureValidationBase64,
                         destinataire: signatureDestinataireBase64
-                    }
+                    },
+                    motif: formData.get('remarque') || null
                 };
 
                 // Envoyer les données au backend
-                const response = await fetch('/api/restitution', {
+                const response = await fetch(`${API_BASE}/restitution`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -313,9 +355,24 @@
                     // Afficher un message de succès
                     alert('Restitution enregistrée avec succès ! Redirection vers l\'historique...');
                     
-                    // Rediriger vers l'historique après un court délai
+                    // Afficher le numéro de fiche généré
+                    if (result.numero_fiche) {
+                        document.getElementById('restitution-numero-fiche').value = result.numero_fiche;
+                    }
+                    
+                    // Vider le formulaire
+                    document.getElementById('form-restitution').reset();
+                    
+                    // Supprimer toutes les lignes de matériel sauf la première
+                    const tbody = document.querySelector('table.data-table tbody');
+                    const rows = tbody.querySelectorAll('tr');
+                    for (let i = 1; i < rows.length; i++) {
+                        rows[i].remove();
+                    }
+                    
+                    // Rediriger vers l'historique 
                     setTimeout(() => {
-                        window.location.href = '/historique';
+                        window.location.href = '{{ url_for('main.historique') }}';
                     }, 1500);
                 } else {
                     alert('Erreur lors de l\'enregistrement: ' + result.error);
